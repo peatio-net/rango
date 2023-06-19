@@ -18,8 +18,8 @@ RUN go mod download
 COPY . .
 RUN go build ./cmd/rango
 
-
-FROM alpine:3.17.3
+#Runner
+FROM alpine:3.18.2
 
 RUN apk add ca-certificates
 WORKDIR app
