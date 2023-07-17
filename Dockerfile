@@ -1,10 +1,10 @@
-FROM golang:1.16-alpine AS builder
+FROM golang:1.20-alpine AS builder
 
-RUN apk add --no-cache curl
+RUN apk update && apk add curl gcc g++ libc-dev
 
-ARG KAIGARA_VERSION=v1.0.29
+ARG KAIGARA_VERSION=v1.0.34
 # Install Kaigara
-RUN curl -Lo /usr/bin/kaigara https://github.com/openware/kaigara/releases/download/${KAIGARA_VERSION}/kaigara \
+RUN curl -Lso /usr/bin/kaigara https://github.com/openware/kaigara/releases/download/${KAIGARA_VERSION}/kaigara \
   && chmod +x /usr/bin/kaigara
 
 WORKDIR /build
@@ -18,7 +18,7 @@ RUN go mod download
 COPY . .
 RUN go build ./cmd/rango
 
-#Runner
+
 FROM alpine:3.18.2
 
 RUN apk add ca-certificates
