@@ -3,6 +3,7 @@ FROM golang:1.20-alpine AS builder
 RUN apk update && apk add curl gcc g++ libc-dev
 
 ARG KAIGARA_VERSION=0.1.34
+#ARG KAIGARA_VERSION=v1.0.35
 # Install Kaigara
 RUN curl -Lso /usr/bin/kaigara https://github.com/openware/kaigara/releases/download/${KAIGARA_VERSION}/kaigara \
   && chmod +x /usr/bin/kaigara
