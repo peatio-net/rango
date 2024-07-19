@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine AS builder
+FROM golang:1.20.2-alpine AS builder
 
 RUN apk update && apk add curl gcc g++ libc-dev
 
