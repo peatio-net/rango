@@ -79,19 +79,16 @@ func setupLogger() {
 
 func getPublicKey() (pub ed25519.PublicKey, err error) {
 	ks := jwt.KeyStoreEdDSA{}
-	encPem := os.Getenv("JWT_PUBLIC_KEY")
+    encPem := os.Getenv("JWT_PUBLIC_KEY")
 
-	if encPem != "" {
-		ks.LoadPublicKeyFromString(encPem)
-	} else {
-		ks.LoadPublicKeyFromFile(*pubKey)
-	}
-	if err != nil {
-		return nil, err
-	}
-	if ks.PublicKey == nil {
-		return nil, fmt.Errorf("failed")
-	}
+    if encPem != "" {
+        err = ks.LoadPublicKeyFromString(encPem)
+    } else {
+        err = ks.LoadPublicKeyFromFile(*pubKey)
+    }
+    if err != nil {  // This check was missing
+        return nil, err
+    }
 	return ks.PublicKey, nil
 }
 
@@ -216,6 +213,21 @@ func main() {
 	http.HandleFunc("/private", authHandler(wsHandler, pub, true))
 	http.HandleFunc("/public", authHandler(wsHandler, pub, false))
 	http.HandleFunc("/", authHandler(wsHandler, pub, false))
+
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("OK"))
+	})
+
+/*	http.HandleFunc("/ready", func(w http.ResponseWriter, r *http.Request) {
+    // Check AMQP connections are alive
+    if globalMq.IsConnected() && privateMq.IsConnected() {
+        w.WriteHeader(http.StatusOK)
+    } else {
+        w.WriteHeader(http.StatusServiceUnavailable)
+    }
+	})
+*/
 
 	go http.ListenAndServe(":4242", promhttp.Handler())
 
